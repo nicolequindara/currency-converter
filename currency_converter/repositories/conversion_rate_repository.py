@@ -20,6 +20,7 @@ class ConversionRateRepository:
             dictionary of country code to ConversionRate
         """
         if force_refresh_cache or not self.rate_map:
+            print("Retrieving conversion rate information from CSV")
             rate_map = {} # singleton map of country code to ConversionRate
             with open(FILENAME, mode="r") as csvfile:
                 rows = csv.reader(csvfile, delimiter=",")

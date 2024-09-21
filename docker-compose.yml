@@ -1,0 +1,13 @@
+name: currency-converter
+services:
+  api:
+    container_name: currency-converter-api
+    build:
+      context: .
+      dockerfile: ./currency_converter/Dockerfile
+    volumes:
+      - ./:/app
+      - /app/.venv
+    ports:
+      - "8000:8000"
+    command: fastapi run currency_converter/main.py

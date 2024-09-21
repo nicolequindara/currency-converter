@@ -1,31 +1,34 @@
-# Alaska Airlines Interview - Currency Converter API
+# Currency Converter
+This repository features a simple python web controller written in Python using [FastAPI](https://fastapi.tiangolo.com/).  The API exposes three endpoints centered around currency conversion utilities:
+- Get all supported conversion rates
+- Get conversion rate by country code (if supported)
+- Convert amount from one currency to another
 
-## Problem Definition
-We've been asked to create a currency conversion web service endpoint.
 
-### Details 
-* The endpoint should take FromCountry, ToCountry, and Amount, and return a converted Amount. 
-* Our consumers are varied, including an internal accounting system and our website's searched flight pricing.
-* This web service will be scaled horizontally. 
-* Leadership is OK with eventual consistency of the conversion rate data on each node. If currency rates in some nodes lag a few minutes behind latest currency rates in other nodes, that's OK.
+# How to run
+1. Install Docker desktop
+2. Run `docker-compose build --up`
+3. Open a browser to http://0.0.0.0:8000/docs
+4. Use swagger to interact with the API
+![Swagger](./screenshots/swagger.png)
 
-### Details of Team Who Will Own This Service
-* Our consumers mostly use REST web services.
-* We mostly uses .NET. 
-* We strive to use the latest stable tech where applicable. 
-* We lean on HTTP standards where possible.
 
-### Conversion Rate Data Source
-Our currency rates come from a csv file containing CountryCode, CurrencyName, and RateFromUSDToCurrency. This csv file is located on the file system, and updated by another process about once per hour. Included is an example csv. We're hoping to switch to a third party service to get our conversion rates later.
+# Design
+![Current Design](./screenshots/current_design.png)
+## Repository
+The repository encapsulates all logic required to access the database.  In the case of this proof-of-concept, no database is used, but rather the repository caches conversion rates from a CSV file.  
+## Service Class
+The service class contains any business logic relating to conversion rates or performing currency conversions.
+## Controller
+The controller endpoints are lean and call into service classes.
 
-### Out of scope
-* Load balancing and other networking
-* Authorization and Authentication
-
-## How to submit
-Submit a PR to your private repo and invite the github users provided by your recruiter as collaborators.
-
-On your PR, feel free to add comments such as:
-* Any follow up questions you would have asked business or other devs on the team?
-* Decisions you made in lieu of more clear requirements.
-* Enhancements you'd make later, given more time.
+# Future Design
+![Future Design](./screenshots/future_design.png)
+## Repository
+In the future, we introduce a database and a database cache to optimize fetching frequent or expensive queries.  A normalized database is not highly demanded by this data as we only have one domain model that is not relational to any other entities.  In fact, a key-value NoSQL store like Redis could be suitable.
+## Task queue
+A task queue or cron job can be used to ingest third party data on a regular cadence.
+## Service Class
+The service class (or another dedicated ingestion service) will periodically fetch up-to-date conversion rates from a third party service and transform the data if necessary.  This class is then responsible for updating the data store(s).
+## API Cache
+In the future, we introduce an API cache for improved client performance.

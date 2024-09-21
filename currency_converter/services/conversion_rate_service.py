@@ -1,10 +1,11 @@
 from decimal import Decimal
 from typing import List, Optional
+from currency_converter.dto import ConvertCurrencyResponse
 from currency_converter.domain import ConversionRate
 from currency_converter.repositories import ConversionRateRepository
 
 
-class CurrencyService:
+class ConversionRateService:
     def __init__(
         self, conversion_rate_repository: Optional[ConversionRateRepository] = None
     ):
@@ -42,7 +43,7 @@ class CurrencyService:
 
     def convert(
         self, from_country_code: str, to_country_code: str, amount: Decimal
-    ) -> Decimal:
+    ) -> ConvertCurrencyResponse:
         """
         Convert amount from a currency to another currency
 
@@ -58,17 +59,20 @@ class CurrencyService:
             Decimal: converted amount
         """
         try:
-            from_rate = self.get(from_country_code).conversion_rate
+            from_rate = self.get(from_country_code)
         except AttributeError as exc:
             raise ValueError(
                 f"Unsupported country code {from_country_code.upper()}"
             ) from exc
 
         try:
-            to_rate = self.get(to_country_code).conversion_rate
+            to_rate = self.get(to_country_code)
         except AttributeError as exc:
             raise ValueError(
                 f"Unsupported country code {to_country_code.upper()}"
             ) from exc
 
-        return round(amount * (to_rate / from_rate), 2)
+        return ConvertCurrencyResponse(
+            amount=round(amount * (to_rate.conversion_rate / from_rate.conversion_rate), 2),
+            currency=to_rate.currency
+        )

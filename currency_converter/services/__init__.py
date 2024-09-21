@@ -1,1 +1,1 @@
-from currency_converter.services.currency_service import CurrencyService
+from currency_converter.services.conversion_rate_service import ConversionRateService
