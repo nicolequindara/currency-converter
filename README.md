@@ -12,15 +12,24 @@ This repository features a simple python web controller written in Python using 
 4. Use swagger to interact with the API
 ![Swagger](./screenshots/swagger.png)
 
+Alternatively (without Docker desktop):
+```
+pip install poetry
+poetry config virtualenvs.create false
+poetry install 
+pip install fastapi[standard]
+fastapi run currency_converter/main.py
+```
+
 
 # Design
 ![Current Design](./screenshots/current_design.png)
 ## Repository
-The repository encapsulates all logic required to access the database.  In the case of this proof-of-concept, no database is used, but rather the repository caches conversion rates from a CSV file.  
+The repository encapsulates all logic required to access the database.  In the case of this proof-of-concept, no database is used, but rather the repository caches conversion rates from a CSV file.  The cache is not updated in this proof-of-concept as requirements are unclear, but a mechanism to force refresh is included in the repository.  Does the system have an underlying event bus to indicate when the CSV is updated?  Is it sufficient to assume that we can automatically refresh the cache hourly?
 ## Service Class
-The service class contains any business logic relating to conversion rates or performing currency conversions.
+The service class contains any business logic relating to conversion rates or performing currency conversions.  This proof-of-concept does not feature dependency injection but rather concepts of dependency injection.  The service class does not instantiate the repository, for example, but rather accepts it as a constructor parameter.
 ## Controller
-The controller endpoints are lean and call into service classes.
+The controller endpoints are lean and call into service classes.  It handles unknown currencies with response error codes.  Should the API define a different response strategy (like error codes or NoContent responses)?
 
 # Future Design
 ![Future Design](./screenshots/future_design.png)
